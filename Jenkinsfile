@@ -10,7 +10,7 @@ pipeline {
         stage('Checkout Code') {
             steps {
                 git branch: 'main',
-                    url: 'https://github.com/yourgithubusername/aws-devops-e2e-project.git'
+                    url: 'https://github.com/maruti123882/aws-devops-e2e-project-.git'
             }
         }
 
