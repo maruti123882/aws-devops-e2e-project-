@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     environment {
-        IMAGE_NAME = "yourdockerhubusername/e2e-java-app"
+        IMAGE_NAME = "e2e-java-app"
     }
 
     stages {
@@ -22,7 +22,15 @@ pipeline {
 
         stage('Docker Build') {
             steps {
-                sh 'docker build -t $IMAGE_NAME:latest .'
+                withCredentials([usernamePassword(
+                    credentialsId: 'dockerhub-creds',
+                    usernameVariable: 'DOCKER_USER',
+                    passwordVariable: 'DOCKER_PASS'
+                )]) {
+                    sh '''
+                      docker build -t $DOCKER_USER/$IMAGE_NAME:latest .
+                    '''
+                }
             }
         }
 
@@ -40,18 +48,15 @@ pipeline {
 
         stage('Docker Push') {
             steps {
-                sh 'docker push $IMAGE_NAME:latest'
+                withCredentials([usernamePassword(
+                    credentialsId: 'dockerhub-creds',
+                    usernameVariable: 'DOCKER_USER',
+                    passwordVariable: 'DOCKER_PASS'
+                )]) {
+                    sh 'docker push $DOCKER_USER/$IMAGE_NAME:latest'
+                }
             }
         }
-
-     /*   stage('Deploy to Kubernetes') {
-            steps {
-                sh '''
-                kubectl apply -f deployment.yaml
-                kubectl apply -f service.yaml
-                '''
-            }
-        } 
-        */
     }
 }
+
