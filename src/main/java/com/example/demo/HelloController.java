@@ -11,3 +11,4 @@ public class HelloController {
         return "E2E Java App is running successfully 🚀";
     }
 }
+
