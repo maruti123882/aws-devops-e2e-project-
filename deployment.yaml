@@ -14,6 +14,6 @@ spec:
     spec:
       containers:
       - name: java-container
-        image: yourdockerhubusername/e2e-java-app:latest
+        image: maruti8861/e2e-java-app:latest
         ports:
         - containerPort: 8080
