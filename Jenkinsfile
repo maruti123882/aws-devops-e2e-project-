@@ -3,6 +3,7 @@ pipeline {
 
     environment {
         IMAGE_NAME = "e2e-java-app"
+        KUBECONFIG = "/var/lib/jenkins/.kube/config"
     }
 
     stages {
@@ -28,20 +29,8 @@ pipeline {
                     passwordVariable: 'DOCKER_PASS'
                 )]) {
                     sh '''
-                      docker build -t $DOCKER_USER/$IMAGE_NAME:latest .
+                    docker build -t $DOCKER_USER/$IMAGE_NAME:latest .
                     '''
-                }
-            }
-        }
-
-        stage('Docker Login') {
-            steps {
-                withCredentials([usernamePassword(
-                    credentialsId: 'dockerhub-creds',
-                    usernameVariable: 'DOCKER_USER',
-                    passwordVariable: 'DOCKER_PASS'
-                )]) {
-                    sh 'echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin'
                 }
             }
         }
@@ -53,19 +42,33 @@ pipeline {
                     usernameVariable: 'DOCKER_USER',
                     passwordVariable: 'DOCKER_PASS'
                 )]) {
-                    sh 'docker push $DOCKER_USER/$IMAGE_NAME:latest'
+                    sh '''
+                    echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin
+                    docker push $DOCKER_USER/$IMAGE_NAME:latest
+                    '''
                 }
             }
         }
-     stage('Deploy to Kubernetes') {
+
+        stage('Deploy to Kubernetes') {
             steps {
                 sh '''
+                kubectl get nodes
                 kubectl apply -f deployment.yaml
                 kubectl apply -f service.yaml
                 '''
             }
         }
 
+    }
+
+    post {
+        success {
+            echo "Deployment Successful 🚀"
+        }
+        failure {
+            echo "Pipeline Failed ❌"
+        }
     }
 }
 
