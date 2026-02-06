@@ -50,25 +50,21 @@ pipeline {
             }
         }
 
-        stage('Deploy to Kubernetes') {
-            steps {
-                sh '''
-                kubectl get nodes
-                kubectl apply -f deployment.yaml
-                kubectl apply -f service.yaml
-                '''
-            }
-        }
+stage('Deploy to Kubernetes') {
+    steps {
+        sh '''
+        export KUBECONFIG=/home/ubuntu/.kube/config
 
-    }
+        echo "Using kubeconfig:"
+        echo $KUBECONFIG
 
-    post {
-        success {
-            echo "Deployment Successful 🚀"
-        }
-        failure {
-            echo "Pipeline Failed ❌"
-        }
+        kubectl config view
+        kubectl get nodes
+
+        kubectl apply -f deployment.yaml
+        kubectl apply -f service.yaml
+        '''
     }
 }
+
 
