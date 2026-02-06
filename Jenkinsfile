@@ -55,12 +55,7 @@ stage('Deploy to Kubernetes') {
         sh '''
         export KUBECONFIG=/home/ubuntu/.kube/config
 
-        echo "Using kubeconfig:"
-        echo $KUBECONFIG
-
-        kubectl config view
         kubectl get nodes
-
         kubectl apply -f deployment.yaml
         kubectl apply -f service.yaml
         '''
